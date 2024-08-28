@@ -11,7 +11,6 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { styled } from '@mui/system';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -52,19 +51,19 @@ const EditTreatmentDialog: React.FC<EditTreatmentDialogProps> = ({
   const [medicineName, setMedicineName] = useState(treatment.medicineName || '');
   const [frequency, setFrequency] = useState(treatment.frequency || 1);
   const [times, setTimes] = useState<string[]>(treatment.times || ['']);
-  const [startDate, setStartDate] = useState<Date | null>(
-    treatment.startDate ? new Date(treatment.startDate.seconds * 1000) : null
+  const [startDate, setStartDate] = useState<string>(
+    treatment.startDate ? new Date(treatment.startDate.seconds * 1000).toISOString().split('T')[0] : ''
   );
-  const [endDate, setEndDate] = useState<Date | null>(
-    treatment.endDate ? new Date(treatment.endDate.seconds * 1000) : null
+  const [endDate, setEndDate] = useState<string>(
+    treatment.endDate ? new Date(treatment.endDate.seconds * 1000).toISOString().split('T')[0] : ''
   );
 
   useEffect(() => {
     setMedicineName(treatment.medicineName || '');
     setFrequency(treatment.frequency || 1);
     setTimes(treatment.times || ['']);
-    setStartDate(treatment.startDate ? new Date(treatment.startDate.seconds * 1000) : null);
-    setEndDate(treatment.endDate ? new Date(treatment.endDate.seconds * 1000) : null);
+    setStartDate(treatment.startDate ? new Date(treatment.startDate.seconds * 1000).toISOString().split('T')[0] : '');
+    setEndDate(treatment.endDate ? new Date(treatment.endDate.seconds * 1000).toISOString().split('T')[0] : '');
   }, [treatment]);
 
   const handleFrequencyChange = (_event: Event, newValue: number | number[]) => {
@@ -100,151 +99,137 @@ const EditTreatmentDialog: React.FC<EditTreatmentDialogProps> = ({
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Dialog 
-        open={open} 
-        onClose={onClose} 
-        fullWidth 
-        maxWidth="sm"
-        PaperProps={{
-          style: {
-            backgroundColor: '#1E1E2E',
-            boxShadow: 'none', // Remove shadow from dialog box
-          },
-        }}
-      >
-        <DialogTitle>
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              color: 'rgba(255, 255, 255, 0.9)', 
-              fontWeight: 700,
-              textShadow: 'none' // Remove shadow from title
-            }}
-          >
-            Edit Treatment
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ '& > :not(style)': { m: 1 } }}>
-            <StyledTextField
-              fullWidth
-              label="Medicine Name"
-              value={medicineName}
-              onChange={(e) => setMedicineName(e.target.value)}
-              margin="normal"
-              required
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="sm"
+      PaperProps={{
+        style: {
+          backgroundColor: '#1E1E2E',
+          boxShadow: 'none', // Remove shadow from dialog box
+        },
+      }}
+    >
+      <DialogTitle>
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            color: 'rgba(255, 255, 255, 0.9)', 
+            fontWeight: 700,
+            textShadow: 'none' // Remove shadow from title
+          }}
+        >
+          Edit Treatment
+        </Typography>
+      </DialogTitle>
+      <DialogContent>
+        <Box sx={{ '& > :not(style)': { m: 1 } }}>
+          <StyledTextField
+            fullWidth
+            label="Medicine Name"
+            value={medicineName}
+            onChange={(e) => setMedicineName(e.target.value)}
+            margin="normal"
+            required
+          />
+          <Box sx={{ mt: 3, mb: 2 }}>
+            <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+              Frequency per day: {frequency}
+            </Typography>
+            <Slider
+              value={frequency}
+              onChange={handleFrequencyChange}
+              step={1}
+              marks
+              min={1}
+              max={12}
+              valueLabelDisplay="auto"
+              sx={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                '& .MuiSlider-thumb': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                },
+                '& .MuiSlider-track': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiSlider-rail': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                },
+              }}
             />
-            <Box sx={{ mt: 3, mb: 2 }}>
+          </Box>
+          {times.map((time, index) => (
+            <Box key={index} sx={{ mb: 2 }}>
               <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                Frequency per day: {frequency}
+                Specify the hour to take the {index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : `${index + 1}th`} medicine
               </Typography>
-              <Slider
-                value={frequency}
-                onChange={handleFrequencyChange}
-                step={1}
-                marks
-                min={1}
-                max={12}
-                valueLabelDisplay="auto"
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  '& .MuiSlider-thumb': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  },
-                  '& .MuiSlider-track': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                  },
-                  '& .MuiSlider-rail': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                }}
+              <StyledTextField
+                type="time"
+                value={time}
+                onChange={(e) => handleTimeChange(index, e.target.value)}
+                fullWidth
+                required
               />
             </Box>
-            {times.map((time, index) => (
-              <Box key={index} sx={{ mb: 2 }}>
-                <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                  Specify the hour to take the {index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : `${index + 1}th`} medicine
-                </Typography>
-                <StyledTextField
-                  type="time"
-                  value={time}
-                  onChange={(e) => handleTimeChange(index, e.target.value)}
-                  fullWidth
-                  required
-                />
-              </Box>
-            ))}
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <DatePicker
-                  label="Start Date"
-                  value={startDate}
-                  onChange={(newValue) => setStartDate(newValue)}
-                  renderInput={(params) => (
-                    <StyledTextField 
-                      {...params} 
-                      fullWidth 
-                      required 
-                      sx={{
-                        '& .MuiInputBase-input': {
-                          color: 'white', // Set text color to white
-                        },
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <DatePicker
-                  label="End Date"
-                  value={endDate}
-                  onChange={(newValue) => setEndDate(newValue)}
-                  renderInput={(params) => (
-                    <StyledTextField 
-                      {...params} 
-                      fullWidth 
-                      required 
-                      sx={{
-                        '& .MuiInputBase-input': {
-                          color: 'white', // Set text color to white
-                        },
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
+          ))}
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <StyledTextField
+                label="Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                fullWidth
+                required
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
             </Grid>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ padding: 2, justifyContent: 'space-between' }}>
-          <Button 
-            onClick={onClose}
-            sx={{ 
-              color: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              }
-            }}
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSave}
-            variant="contained"
-            sx={{ 
-              backgroundColor: '#FF6B6B', // Change Save Changes button color
-              color: 'white',
-              '&:hover': {
-                backgroundColor: '#FF8C8C',
-              }
-            }}
-          >
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </LocalizationProvider>
+            <Grid item xs={6}>
+              <StyledTextField
+                label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                fullWidth
+                required
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ padding: 2, justifyContent: 'space-between' }}>
+        <Button 
+          onClick={onClose}
+          sx={{ 
+            color: 'rgba(255, 255, 255, 0.7)',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            }
+          }}
+        >
+          Cancel
+        </Button>
+        <Button 
+          onClick={handleSave}
+          variant="contained"
+          sx={{ 
+            backgroundColor: '#FF6B6B', // Change Save Changes button color
+            color: 'white',
+            '&:hover': {
+              backgroundColor: '#FF8C8C',
+            }
+          }}
+        >
+          Save Changes
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

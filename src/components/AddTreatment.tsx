@@ -40,8 +40,8 @@ const AddTreatment: React.FC = () => {
   const [medicineName, setMedicineName] = useState('');
   const [frequency, setFrequency] = useState(1);
   const [times, setTimes] = useState<string[]>(['']);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const navigate = useNavigate();
   const { testNotification } = useNotifications();
 
@@ -90,127 +90,135 @@ const AddTreatment: React.FC = () => {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ p: 2, pt: 0 }}>
-        <Typography 
-          variant="h4" 
-          gutterBottom 
-          align="center" 
-          sx={{ 
-            color: 'rgba(255, 255, 255, 0.9)', 
-            fontWeight: 700, 
-            mb: 3,
-            textShadow: 'none'
-          }}
-        >
-          Add New Treatment
-        </Typography>
-        <StyledForm onSubmit={handleSubmit}>
-          <StyledTextField
-            fullWidth
-            label="Medicine Name"
-            value={medicineName}
-            onChange={(e) => setMedicineName(e.target.value)}
-            margin="normal"
-            required
+    <Box sx={{ p: 2, pt: 0 }}>
+      <Typography 
+        variant="h4" 
+        gutterBottom 
+        align="center" 
+        sx={{ 
+          color: 'rgba(255, 255, 255, 0.9)', 
+          fontWeight: 700, 
+          mb: 3,
+          textShadow: 'none'
+        }}
+      >
+        Add New Treatment
+      </Typography>
+      <StyledForm onSubmit={handleSubmit}>
+        <StyledTextField
+          fullWidth
+          label="Medicine Name"
+          value={medicineName}
+          onChange={(e) => setMedicineName(e.target.value)}
+          margin="normal"
+          required
+        />
+        <Box sx={{ mt: 3, mb: 2 }}>
+          <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+            Frequency per day: {frequency}
+          </Typography>
+          <Slider
+            value={frequency}
+            onChange={handleFrequencyChange}
+            step={1}
+            marks
+            min={1}
+            max={12}
+            valueLabelDisplay="auto"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              '& .MuiSlider-thumb': {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              },
+              '& .MuiSlider-track': {
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              },
+              '& .MuiSlider-rail': {
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              },
+            }}
           />
-          <Box sx={{ mt: 3, mb: 2 }}>
+        </Box>
+        {times.map((time, index) => (
+          <Box key={index} sx={{ mb: 2 }}>
             <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-              Frequency per day: {frequency}
+              Specify the hour to take the {index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : `${index + 1}th`} medicine
             </Typography>
-            <Slider
-              value={frequency}
-              onChange={handleFrequencyChange}
-              step={1}
-              marks
-              min={1}
-              max={12}
-              valueLabelDisplay="auto"
-              sx={{
-                color: 'rgba(255, 255, 255, 0.7)',
-                '& .MuiSlider-thumb': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                },
-                '& .MuiSlider-track': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                },
-                '& .MuiSlider-rail': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                },
+            <StyledTextField
+              type="time"
+              value={time}
+              onChange={(e) => handleTimeChange(index, e.target.value)}
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{
+                step: 300, // 5 min
               }}
             />
           </Box>
-          {times.map((time, index) => (
-            <Box key={index} sx={{ mb: 2 }}>
-              <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                Specify the hour to take the {index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : `${index + 1}th`} medicine
-              </Typography>
-              <StyledTextField
-                type="time"
-                value={time}
-                onChange={(e) => handleTimeChange(index, e.target.value)}
-                fullWidth
-                required
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  step: 300, // 5 min
-                }}
-              />
-            </Box>
-          ))}
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <DatePicker
-                label="Start Date"
-                value={startDate}
-                onChange={(newValue) => setStartDate(newValue)}
-                renderInput={(params) => <StyledTextField {...params} fullWidth required />}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <DatePicker
-                label="End Date"
-                value={endDate}
-                onChange={(newValue) => setEndDate(newValue)}
-                renderInput={(params) => <StyledTextField {...params} fullWidth required />}
-              />
-            </Grid>
+        ))}
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <StyledTextField
+              label="Start Date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
           </Grid>
-          <Button 
-            type="submit" 
-            fullWidth 
-            variant="contained" 
-            sx={{ 
-              mt: 3, 
-              bgcolor: '#FF6B6B', 
-              color: 'white',
-              '&:hover': { 
-                bgcolor: '#FF8C8C' 
-              } 
-            }}
-          >
-            Save Treatment
-          </Button>
-        </StyledForm>
+          <Grid item xs={6}>
+            <StyledTextField
+              label="End Date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+        </Grid>
         <Button 
-          onClick={testNotification}
+          type="submit" 
           fullWidth 
-          variant="outlined" 
+          variant="contained" 
           sx={{ 
-            mt: 2, 
-            color: '#FF6B6B', 
-            borderColor: '#FF6B6B',
+            mt: 3, 
+            bgcolor: '#FF6B6B', 
+            color: 'white',
             '&:hover': { 
-              bgcolor: 'rgba(255, 107, 107, 0.1)' 
+              bgcolor: '#FF8C8C' 
             } 
           }}
         >
-          Test Notification
+          Save Treatment
         </Button>
-      </Box>
-    </LocalizationProvider>
+      </StyledForm>
+      <Button 
+        onClick={testNotification}
+        fullWidth 
+        variant="outlined" 
+        sx={{ 
+          mt: 2, 
+          color: '#FF6B6B', 
+          borderColor: '#FF6B6B',
+          '&:hover': { 
+            bgcolor: 'rgba(255, 107, 107, 0.1)' 
+          } 
+        }}
+      >
+        Test Notification
+      </Button>
+    </Box>
   );
 };
 
