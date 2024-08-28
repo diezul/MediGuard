@@ -1,0 +1,28 @@
+{
+  "files": {
+    "src/components/AuthWrapper.tsx": [
+      {
+        "id": "b16a011e-eb9b-4615-812c-d6622ed0e675",
+        "line": 1,
+        "version": 26,
+        "index": 0
+      }
+    ],
+    "src/components/Treatments.tsx": [
+      {
+        "id": "76336dc1-d241-42c4-8e0c-5abad1d86b26",
+        "line": 1,
+        "version": 21,
+        "index": 0
+      }
+    ],
+    "src/components/WelcomeScreen.tsx": [
+      {
+        "id": "9004baba-0ead-4e1d-b339-316538a155f9",
+        "line": 26,
+        "version": 2,
+        "index": 920
+      }
+    ]
+  }
+}

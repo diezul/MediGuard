@@ -1,0 +1,24 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  background-color: #1E1E2F; /* Ensure the background covers the whole page */
+}
+
+.page-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.footer {
+  display: none; /* Hide the footer */
+}
