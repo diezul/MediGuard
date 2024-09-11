@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Slider,
-  Grid,
-  Box,
-  Typography,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Slider, Grid, Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { DatePicker } from '@mui/lab'; // Import DatePicker clasic
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
@@ -42,28 +32,23 @@ interface EditTreatmentDialogProps {
   onSave: (updatedTreatment: any) => void;
 }
 
-const EditTreatmentDialog: React.FC<EditTreatmentDialogProps> = ({
-  open,
-  onClose,
-  treatment,
-  onSave,
-}) => {
+const EditTreatmentDialog: React.FC<EditTreatmentDialogProps> = ({ open, onClose, treatment, onSave }) => {
   const [medicineName, setMedicineName] = useState(treatment.medicineName || '');
   const [frequency, setFrequency] = useState(treatment.frequency || 1);
   const [times, setTimes] = useState<string[]>(treatment.times || ['']);
-  const [startDate, setStartDate] = useState<string>(
-    treatment.startDate ? new Date(treatment.startDate.seconds * 1000).toISOString().split('T')[0] : ''
+  const [startDate, setStartDate] = useState<Date | null>(
+    treatment.startDate ? new Date(treatment.startDate.seconds * 1000) : null
   );
-  const [endDate, setEndDate] = useState<string>(
-    treatment.endDate ? new Date(treatment.endDate.seconds * 1000).toISOString().split('T')[0] : ''
+  const [endDate, setEndDate] = useState<Date | null>(
+    treatment.endDate ? new Date(treatment.endDate.seconds * 1000) : null
   );
 
   useEffect(() => {
     setMedicineName(treatment.medicineName || '');
     setFrequency(treatment.frequency || 1);
     setTimes(treatment.times || ['']);
-    setStartDate(treatment.startDate ? new Date(treatment.startDate.seconds * 1000).toISOString().split('T')[0] : '');
-    setEndDate(treatment.endDate ? new Date(treatment.endDate.seconds * 1000).toISOString().split('T')[0] : '');
+    setStartDate(treatment.startDate ? new Date(treatment.startDate.seconds * 1000) : null);
+    setEndDate(treatment.endDate ? new Date(treatment.endDate.seconds * 1000) : null);
   }, [treatment]);
 
   const handleFrequencyChange = (_event: Event, newValue: number | number[]) => {
@@ -175,29 +160,19 @@ const EditTreatmentDialog: React.FC<EditTreatmentDialogProps> = ({
           ))}
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <StyledTextField
+              <DatePicker
                 label="Start Date"
-                type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                fullWidth
-                required
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                onChange={(newDate) => setStartDate(newDate)}
+                renderInput={(params) => <StyledTextField {...params} />}
               />
             </Grid>
             <Grid item xs={6}>
-              <StyledTextField
+              <DatePicker
                 label="End Date"
-                type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                fullWidth
-                required
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                onChange={(newDate) => setEndDate(newDate)}
+                renderInput={(params) => <StyledTextField {...params} />}
               />
             </Grid>
           </Grid>

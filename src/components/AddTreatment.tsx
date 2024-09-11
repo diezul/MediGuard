@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useNotifications } from '../hooks/useNotifications';
+import { DatePicker } from '@mui/lab'; // Import DatePicker clasic
 
 const StyledForm = styled('form')(({ theme }) => ({
   width: '100%',
@@ -40,8 +41,8 @@ const AddTreatment: React.FC = () => {
   const [medicineName, setMedicineName] = useState('');
   const [frequency, setFrequency] = useState(1);
   const [times, setTimes] = useState<string[]>(['']);
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const navigate = useNavigate();
   const { testNotification } = useNotifications();
 
@@ -161,29 +162,19 @@ const AddTreatment: React.FC = () => {
         ))}
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <StyledTextField
+            <DatePicker
               label="Start Date"
-              type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              fullWidth
-              required
-              InputLabelProps={{
-                shrink: true,
-              }}
+              onChange={(newDate) => setStartDate(newDate)}
+              renderInput={(params) => <StyledTextField {...params} />}
             />
           </Grid>
           <Grid item xs={6}>
-            <StyledTextField
+            <DatePicker
               label="End Date"
-              type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              fullWidth
-              required
-              InputLabelProps={{
-                shrink: true,
-              }}
+              onChange={(newDate) => setEndDate(newDate)}
+              renderInput={(params) => <StyledTextField {...params} />}
             />
           </Grid>
         </Grid>
