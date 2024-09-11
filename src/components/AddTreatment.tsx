@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useNotifications } from '../hooks/useNotifications';
-import { DatePicker } from '@mui/lab'; // Import DatePicker clasic
+import DatePicker from 'react-datepicker'; // Import DatePicker gratuit
+import 'react-datepicker/dist/react-datepicker.css'; // Import stiluri pentru DatePicker
 
 const StyledForm = styled('form')(({ theme }) => ({
   width: '100%',
@@ -163,18 +164,20 @@ const AddTreatment: React.FC = () => {
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <DatePicker
-              label="Start Date"
-              value={startDate}
-              onChange={(newDate) => setStartDate(newDate)}
-              renderInput={(params) => <StyledTextField {...params} />}
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              dateFormat="yyyy/MM/dd"
+              placeholderText="Start Date"
+              customInput={<StyledTextField label="Start Date" fullWidth />}
             />
           </Grid>
           <Grid item xs={6}>
             <DatePicker
-              label="End Date"
-              value={endDate}
-              onChange={(newDate) => setEndDate(newDate)}
-              renderInput={(params) => <StyledTextField {...params} />}
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              dateFormat="yyyy/MM/dd"
+              placeholderText="End Date"
+              customInput={<StyledTextField label="End Date" fullWidth />}
             />
           </Grid>
         </Grid>

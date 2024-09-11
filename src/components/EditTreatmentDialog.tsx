@@ -3,7 +3,8 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, S
 import { styled } from '@mui/system';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { DatePicker } from '@mui/lab'; // Import DatePicker clasic
+import DatePicker from 'react-datepicker'; // Import DatePicker gratuit
+import 'react-datepicker/dist/react-datepicker.css'; // Import stiluri pentru DatePicker
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
@@ -161,18 +162,20 @@ const EditTreatmentDialog: React.FC<EditTreatmentDialogProps> = ({ open, onClose
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <DatePicker
-                label="Start Date"
-                value={startDate}
-                onChange={(newDate) => setStartDate(newDate)}
-                renderInput={(params) => <StyledTextField {...params} />}
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                dateFormat="yyyy/MM/dd"
+                placeholderText="Start Date"
+                customInput={<StyledTextField label="Start Date" fullWidth />}
               />
             </Grid>
             <Grid item xs={6}>
               <DatePicker
-                label="End Date"
-                value={endDate}
-                onChange={(newDate) => setEndDate(newDate)}
-                renderInput={(params) => <StyledTextField {...params} />}
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                dateFormat="yyyy/MM/dd"
+                placeholderText="End Date"
+                customInput={<StyledTextField label="End Date" fullWidth />}
               />
             </Grid>
           </Grid>
