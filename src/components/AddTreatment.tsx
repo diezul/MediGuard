@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useNotifications } from '../hooks/useNotifications';
-import DatePicker from 'react-datepicker'; // Import DatePicker gratuit
-import 'react-datepicker/dist/react-datepicker.css'; // Import stiluri pentru DatePicker
+import DatePicker from 'react-datepicker'; // Utilizează react-datepicker
+import 'react-datepicker/dist/react-datepicker.css'; // Importă stilurile necesare
 
 const StyledForm = styled('form')(({ theme }) => ({
   width: '100%',
@@ -16,26 +16,6 @@ const StyledForm = styled('form')(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   backgroundColor: 'rgba(255, 255, 255, 0.1)',
   backdropFilter: 'blur(10px)',
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: 'rgba(255, 255, 255, 0.5)',
-    },
-    '&:hover fieldset': {
-      borderColor: 'rgba(255, 255, 255, 0.7)',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: 'rgba(255, 255, 255, 0.9)',
-    },
-  },
-  '& .MuiInputLabel-root': {
-    color: 'rgba(255, 255, 255, 0.9)',
-  },
-  '& .MuiInputBase-input': {
-    color: 'rgba(255, 255, 255, 0.9)',
-  },
 }));
 
 const AddTreatment: React.FC = () => {
@@ -73,7 +53,7 @@ const AddTreatment: React.FC = () => {
           userId: user.uid,
           medicineName,
           frequency,
-          times: times.map(time => time.slice(0, 5)), // Ensure times are in HH:MM format
+          times: times.map(time => time.slice(0, 5)),
           startDate,
           endDate,
         };
@@ -107,7 +87,7 @@ const AddTreatment: React.FC = () => {
         Add New Treatment
       </Typography>
       <StyledForm onSubmit={handleSubmit}>
-        <StyledTextField
+        <TextField
           fullWidth
           label="Medicine Name"
           value={medicineName}
@@ -146,18 +126,12 @@ const AddTreatment: React.FC = () => {
             <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
               Specify the hour to take the {index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : `${index + 1}th`} medicine
             </Typography>
-            <StyledTextField
+            <TextField
               type="time"
               value={time}
               onChange={(e) => handleTimeChange(index, e.target.value)}
               fullWidth
               required
-              InputLabelProps={{
-                shrink: true,
-              }}
-              inputProps={{
-                step: 300, // 5 min
-              }}
             />
           </Box>
         ))}
@@ -168,7 +142,7 @@ const AddTreatment: React.FC = () => {
               onChange={(date) => setStartDate(date)}
               dateFormat="yyyy/MM/dd"
               placeholderText="Start Date"
-              customInput={<StyledTextField label="Start Date" fullWidth />}
+              customInput={<TextField label="Start Date" fullWidth />}
             />
           </Grid>
           <Grid item xs={6}>
@@ -177,7 +151,7 @@ const AddTreatment: React.FC = () => {
               onChange={(date) => setEndDate(date)}
               dateFormat="yyyy/MM/dd"
               placeholderText="End Date"
-              customInput={<StyledTextField label="End Date" fullWidth />}
+              customInput={<TextField label="End Date" fullWidth />}
             />
           </Grid>
         </Grid>
@@ -197,21 +171,6 @@ const AddTreatment: React.FC = () => {
           Save Treatment
         </Button>
       </StyledForm>
-      <Button 
-        onClick={testNotification}
-        fullWidth 
-        variant="outlined" 
-        sx={{ 
-          mt: 2, 
-          color: '#FF6B6B', 
-          borderColor: '#FF6B6B',
-          '&:hover': { 
-            bgcolor: 'rgba(255, 107, 107, 0.1)' 
-          } 
-        }}
-      >
-        Test Notification
-      </Button>
     </Box>
   );
 };
