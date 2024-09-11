@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, Slider, Grid } from '@mui/material';
+import { TextField, Button, Typography, Box, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -20,89 +20,52 @@ const AddTreatment: React.FC = () => {
       alert("Please fill in all fields.");
       return;
     }
-
-    const user = auth.currentUser;
-    if (user) {
-      try {
-        const treatmentData = {
-          userId: user.uid,
-          medicineName,
-          frequency,
-          times: times.map(time => time.slice(0, 5)),  // Formatează timpul la HH:MM
-          startDate,
-          endDate,
-        };
-
-        await addDoc(collection(db, "treatments"), treatmentData);
-        alert("Treatment added successfully!");
-        navigate('/treatments');
-      } catch (error) {
-        alert("Failed to add treatment. Please try again.");
-      }
-    } else {
-      alert("You must be logged in to add a treatment.");
+    
+    try {
+      await addDoc(collection(db, "treatments"), {
+        userId: auth.currentUser?.uid,
+        medicineName,
+        frequency,
+        times,
+        startDate,
+        endDate
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Error adding document: ", err);
     }
   };
 
   return (
-    <Box sx={{ p: 2, pt: 0 }}>
-      <Typography variant="h4" align="center">
-        Add New Treatment
-      </Typography>
+    <Box>
+      <Typography variant="h4">Add Treatment</Typography>
       <form onSubmit={handleSubmit}>
         <TextField
-          fullWidth
           label="Medicine Name"
           value={medicineName}
           onChange={(e) => setMedicineName(e.target.value)}
+          fullWidth
           margin="normal"
-          required
         />
-        <Box>
-          <Typography>Frequency per day: {frequency}</Typography>
-          <Slider
-            value={frequency}
-            onChange={(event, newValue) => setFrequency(newValue as number)}
-            step={1}
-            marks
-            min={1}
-            max={12}
-            valueLabelDisplay="auto"
-          />
-        </Box>
-        {times.map((time, index) => (
-          <Box key={index}>
-            <Typography>
-              Specify the hour to take the {index + 1}th medicine
-            </Typography>
-            <TextField
-              type="time"
-              value={time}
-              onChange={(e) => setTimes([...times.slice(0, index), e.target.value, ...times.slice(index + 1)])}
-              required
-            />
-          </Box>
-        ))}
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date as Date)}
-              dateFormat="yyyy/MM/dd"
-              customInput={<TextField label="Start Date" fullWidth />}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date as Date)}
-              dateFormat="yyyy/MM/dd"
-              customInput={<TextField label="End Date" fullWidth />}
-            />
-          </Grid>
-        </Grid>
-        <Button type="submit" fullWidth variant="contained" color="primary">
-          Save Treatment
+
+        <Typography>Start Date</Typography>
+        <DatePicker
+          selected={startDate}
+          onChange={(date: Date) => setStartDate(date)}
+          dateFormat="dd/MM/yyyy"
+          customInput={<TextField fullWidth />}
+        />
+
+        <Typography>End Date</Typography>
+        <DatePicker
+          selected={endDate}
+          onChange={(date: Date) => setEndDate(date)}
+          dateFormat="dd/MM/yyyy"
+          customInput={<TextField fullWidth />}
+        />
+
+        <Button type="submit" variant="contained" color="primary">
+          Submit
         </Button>
       </form>
     </Box>
