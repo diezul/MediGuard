@@ -1,22 +1,10 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Slider, Grid } from '@mui/material';
-import { styled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
-import { useNotifications } from '../hooks/useNotifications';
-import DatePicker from 'react-datepicker'; // Utilizează react-datepicker
-import 'react-datepicker/dist/react-datepicker.css'; // Importă stilurile necesare
-
-const StyledForm = styled('form')(({ theme }) => ({
-  width: '100%',
-  maxWidth: '500px',
-  margin: 'auto',
-  padding: theme.spacing(3),
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  backdropFilter: 'blur(10px)',
-}));
+import DatePicker from 'react-datepicker';  // Importă react-datepicker
+import 'react-datepicker/dist/react-datepicker.css';  // Importă stilurile
 
 const AddTreatment: React.FC = () => {
   const [medicineName, setMedicineName] = useState('');
@@ -25,19 +13,6 @@ const AddTreatment: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const navigate = useNavigate();
-  const { testNotification } = useNotifications();
-
-  const handleFrequencyChange = (_event: Event, newValue: number | number[]) => {
-    const updatedFrequency = newValue as number;
-    setFrequency(updatedFrequency);
-    setTimes(Array(updatedFrequency).fill(''));
-  };
-
-  const handleTimeChange = (index: number, value: string) => {
-    const newTimes = [...times];
-    newTimes[index] = value;
-    setTimes(newTimes);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,17 +28,15 @@ const AddTreatment: React.FC = () => {
           userId: user.uid,
           medicineName,
           frequency,
-          times: times.map(time => time.slice(0, 5)),
+          times: times.map(time => time.slice(0, 5)),  // Formatează timpul la HH:MM
           startDate,
           endDate,
         };
 
         await addDoc(collection(db, "treatments"), treatmentData);
-        console.log('Treatment added:', treatmentData);
         alert("Treatment added successfully!");
         navigate('/treatments');
       } catch (error) {
-        console.error("Error adding treatment:", error);
         alert("Failed to add treatment. Please try again.");
       }
     } else {
@@ -73,20 +46,10 @@ const AddTreatment: React.FC = () => {
 
   return (
     <Box sx={{ p: 2, pt: 0 }}>
-      <Typography 
-        variant="h4" 
-        gutterBottom 
-        align="center" 
-        sx={{ 
-          color: 'rgba(255, 255, 255, 0.9)', 
-          fontWeight: 700, 
-          mb: 3,
-          textShadow: 'none'
-        }}
-      >
+      <Typography variant="h4" align="center">
         Add New Treatment
       </Typography>
-      <StyledForm onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <TextField
           fullWidth
           label="Medicine Name"
@@ -95,42 +58,27 @@ const AddTreatment: React.FC = () => {
           margin="normal"
           required
         />
-        <Box sx={{ mt: 3, mb: 2 }}>
-          <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-            Frequency per day: {frequency}
-          </Typography>
+        <Box>
+          <Typography>Frequency per day: {frequency}</Typography>
           <Slider
             value={frequency}
-            onChange={handleFrequencyChange}
+            onChange={(event, newValue) => setFrequency(newValue as number)}
             step={1}
             marks
             min={1}
             max={12}
             valueLabelDisplay="auto"
-            sx={{
-              color: 'rgba(255, 255, 255, 0.7)',
-              '& .MuiSlider-thumb': {
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              },
-              '& .MuiSlider-track': {
-                backgroundColor: 'rgba(255, 255, 255, 0.7)',
-              },
-              '& .MuiSlider-rail': {
-                backgroundColor: 'rgba(255, 255, 255, 0.3)',
-              },
-            }}
           />
         </Box>
         {times.map((time, index) => (
-          <Box key={index} sx={{ mb: 2 }}>
-            <Typography gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-              Specify the hour to take the {index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : `${index + 1}th`} medicine
+          <Box key={index}>
+            <Typography>
+              Specify the hour to take the {index + 1}th medicine
             </Typography>
             <TextField
               type="time"
               value={time}
-              onChange={(e) => handleTimeChange(index, e.target.value)}
-              fullWidth
+              onChange={(e) => setTimes([...times.slice(0, index), e.target.value, ...times.slice(index + 1)])}
               required
             />
           </Box>
@@ -139,38 +87,24 @@ const AddTreatment: React.FC = () => {
           <Grid item xs={6}>
             <DatePicker
               selected={startDate}
-              onChange={(date) => setStartDate(date)}
+              onChange={(date) => setStartDate(date as Date)}
               dateFormat="yyyy/MM/dd"
-              placeholderText="Start Date"
               customInput={<TextField label="Start Date" fullWidth />}
             />
           </Grid>
           <Grid item xs={6}>
             <DatePicker
               selected={endDate}
-              onChange={(date) => setEndDate(date)}
+              onChange={(date) => setEndDate(date as Date)}
               dateFormat="yyyy/MM/dd"
-              placeholderText="End Date"
               customInput={<TextField label="End Date" fullWidth />}
             />
           </Grid>
         </Grid>
-        <Button 
-          type="submit" 
-          fullWidth 
-          variant="contained" 
-          sx={{ 
-            mt: 3, 
-            bgcolor: '#FF6B6B', 
-            color: 'white',
-            '&:hover': { 
-              bgcolor: '#FF8C8C' 
-            } 
-          }}
-        >
+        <Button type="submit" fullWidth variant="contained" color="primary">
           Save Treatment
         </Button>
-      </StyledForm>
+      </form>
     </Box>
   );
 };
